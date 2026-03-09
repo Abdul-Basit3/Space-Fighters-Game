@@ -1,154 +1,142 @@
-# Space Fighters
+# Space Fighters - Enhanced Edition
 
-An exhilarating space shooter game developed with Python and Pygame featuring progressive enemy AI, boss battles, and power-ups.
+A comprehensive space shooter game built with Python and Pygame featuring 5 progressive levels, bonus missions, multiple ships, and advanced gameplay mechanics.
 
 ## Features
 
-- 3 progressive levels with unique space backgrounds
-- Progressive ship unlocking system (unlock ships by completing levels)
-- Interactive level map for level selection and replay
-- Boss battles at the end of each level
-- Final boss battle with enhanced difficulty
-- 3 types of power-ups: Enhanced Bullets (Bullet 2), Super Bullets (Bullet 3), and Shield
-- Time-based challenges (90 seconds per level)
-- Progressive enemy count (15 enemies in level 1, increasing by 10 each level)
-- Score system with level multipliers
-- Health system with visual health bar
-- Sound effects for shooting, explosions, and game events
-- Background music
-- Level replay system - replay any completed level
-- **Full window management support** - resize, minimize, maximize, close
-- **Responsive design** - game scales to any window size
-- **Full mouse support** - play entirely with mouse if desired
+### Game Progression
+- **5 Progressive Levels**: Each level features unique enemies, bosses, and increasing difficulty
+- **Bonus Asteroid Mission**: Unlocked after completing Level 4, destroy asteroids to gain power-ups
+- **Boss Battles**: Face unique bosses at the end of each level, culminating in the final boss at Level 5
+- **Save/Load System**: Your progress, bullet power, health, and unlocked ships are automatically saved
 
-## Progression System
+### Ships & Unlockables
+- **Ship 1** (Default): Standard spaceship available from the start
+  - Shooting sound: `ship_shoot.wav`
+- **Ship 2**: Unlocked after completing Level 2
+  - Shooting sound: `player_shoot.wav`
+- **Blue Ship**: Unlocked after completing Level 4
+  - Uses blue laser bullets
+  - Faster shooting rate
+  - Shooting sound: `laser_shooting.wav`
 
-- Start with Ship 1 unlocked
-- Complete Level 1 to unlock Ship 2
-- Complete Level 2 to unlock Ship 3
-- Replay any completed level with any unlocked ship
-- Level map shows your progress with completed/locked levels
+### Weapons & Power-ups
+- **Bullet Progression**:
+  - Bullet 1: Default single shot
+  - Bullet 2: Double shot (first power-up)
+  - Bullet 3: Triple spread shot (second power-up)
+  - Bullet 4: Quad shot (third power-up)
+- **Power-up Types**:
+  - Bullet Power: Increases your bullet level
+  - Health: Restores 30 HP
+  - Shield: Temporary invincibility + 20 HP
+- **Bullet Power Reduction**: Your bullet power decreases when hit by enemies
 
-## Requirements
+### Levels & Environments
+- **Dynamic Backgrounds**: Rotates through Space 1, Space 2, and Space 3
+- **Planet Visuals**: Each level displays its corresponding planet (Planet-1 through Planet-5) at the center
+- **Bonus Mission**: Special asteroid field with bonus.jpg background
 
-- Python 3.7+
-- Pygame
+### Enemies
+- **Level-Specific Enemies**: Each level has unique enemy ships (enemy_L1 through enemy_L5)
+- **Progressive AI**: Enemies become smarter and more aggressive in higher levels
+- **Boss Progression**: Unique boss for each level (boss_L1 through boss_L5_ship)
+
+### Audio System
+- **Background Music**: Continuous background music with volume control
+- **Sound Effects**:
+  - Enemy explosions: `explosion_1.wav`
+  - Boss explosions: `explosion_2.wav`
+  - Mission complete: `mission_complete.wav` (Levels 1-4)
+  - Final victory: `Win.mp3` (Level 5 boss defeat)
+  - Game over: `game_over.wav` followed by `loose.wav`
+- **Settings Menu**:
+  - Adjust music volume (0-100%)
+  - Adjust sound effects volume (0-100%)
+  - Mute music independently
+  - Mute sounds independently
+
+### Gameplay Features
+- **Pause System**: Press ESC or P to pause the game
+- **Responsive Window**: Fully resizable game window
+- **Mouse & Keyboard Controls**:
+  - WASD or Arrow Keys: Move ship
+  - Space or Left Mouse: Shoot
+  - Right/Middle Mouse: Drag ship to position
+  - ESC/P: Pause game
+- **Visual Effects**:
+  - Explosion animations for enemies and player
+  - Shield visual indicator
+  - Boss health bar
+  - Bullet power indicator
+  - Real-time HUD with score, health, time, and objectives
+
+### Settings & Progress
+- **Settings Menu**: Access from main menu
+  - Volume controls
+  - Mute options
+  - Reset game progress
+- **Auto-Save**: Progress automatically saved after each level
+- **Manual Save**: Save before quitting from settings menu
 
 ## Installation
 
-```bash
-pip install pygame
-```
-
-## Assets Required
-
-Place these files in the same directory as main.py:
-
-### Images:
-- `space1.jpg`, `space2.jpg`, `space3.jpg` - Level backgrounds
-- `ship1.png`, `ship2.png`, `ship3.png` - Player ship options
-- `enemy_1.png`, `enemy_2.png`, `enemy_3.png` - Enemy ships
-- `boss.png` - Mid-level boss
-- `boss_ship.png` - Final boss
-- `bullet_1.png`, `bullet_2.png`, `bullet_3.png` - Bullet types
-- `life_bar.png` - Health bar (optional, will use default if missing)
-
-### Sounds:
-- `background_sound.wav` - Background music
-- `player_shoot.wav` - Player shooting sound
-- `space_shoot1.wav` - Enemy shooting sound
-- `boss_shoot.wav` - Boss shooting sound
-- `explosion_1.wav` - Enemy destruction sound
-- `explosion_2.wav` - Boss destruction sound
-- `game_over.wav` - Game over sound
-
-Note: The game will work without assets by using placeholder graphics and no sound.
-
-## How to Play
-
-```bash
-python main.py
-```
+1. Install Python 3.7 or higher
+2. Install Pygame:
+   ```bash
+   pip install pygame
+   ```
+3. Run the game:
+   ```bash
+   python main.py
+   ```
 
 ## Controls
 
-**Space Fighters supports FULL MOUSE CONTROL!** You can play the entire game with just your mouse, or use keyboard, or mix both.
+### Movement
+- **WASD** or **Arrow Keys**: Move your ship
+- **Right Mouse Button**: Drag ship to position
 
-### Mouse Controls (Full Game Support):
-- **Left Click / Hold**: Fire weapons (in-game)
-- **Right Click + Drag**: Move spaceship by dragging (in-game)
-- **Middle Click + Drag**: Alternative ship movement (in-game)
-- **Click Buttons**: Navigate all menus and screens
-- **Click Levels**: Select levels on the map
-- **Click Ships**: Select ships in ship selection
-- **Click Continue/Restart/Quit**: All message screens
+### Combat
+- **Space** or **Left Mouse Button**: Shoot (hold for continuous fire)
 
-### Keyboard Controls:
-- **Arrow Keys / WASD**: Move spaceship (in-game)
-- **Spacebar**: Fire weapons (in-game)
-- **LEFT/RIGHT Arrows**: Navigate menus
-- **SPACE**: Confirm selections
-- **R**: Restart (on game over screen)
-- **Q**: Quit (on game over screen)
+### Menu Navigation
+- **Arrow Keys**: Navigate menus
+- **Enter/Space**: Select option
+- **ESC**: Go back/Pause game
 
-### Hybrid Controls (Recommended):
-You can combine mouse and keyboard for optimal control:
-- **WASD + Left Click**: Keyboard movement + Mouse shooting
-- **Right Mouse Drag + Spacebar**: Mouse movement + Keyboard shooting
-- **Full Mouse**: Right button to move + Left button to shoot
+### Game Controls
+- **P** or **ESC**: Pause/Resume game
 
-**See CONTROLS.md for complete control guide**
+## Game Progression
 
-## Power-Ups
+1. **Level 1-3**: Complete levels to unlock Ship 2
+2. **Level 4**: Complete to unlock Blue Ship and Bonus Mission
+3. **Bonus Mission**: Optional asteroid destruction mission for power-ups
+4. **Level 5**: Final level with the ultimate boss battle
 
-- **Yellow (Bullet 2)**: Enhanced double-shot bullets
-- **Purple (Bullet 3)**: Super triple-shot bullets with increased damage
-- **Green (Shield)**: Protects from damage and restores 30 health
+## Tips
 
-## Gameplay
+- Collect power-ups to increase your bullet power
+- Your bullet power decreases when hit, so avoid enemy fire
+- Use the bonus mission to maximize your power before Level 5
+- Shield power-ups provide temporary invincibility
+- Each ship has unique characteristics - experiment to find your favorite
+- Pause the game to access settings and adjust audio levels
 
-- Start by viewing the level map - only Level 1 is available initially
-- Select your spaceship (only Ship 1 is unlocked at start)
-- Destroy the required number of enemies to spawn the boss
-- Defeat the boss to complete the level
-- Completing levels unlocks new ships and levels
-- Collect power-ups to enhance your weapons
-- Avoid enemy bullets and collisions
-- Complete all 3 levels and defeat the final boss to win
-- Each level increases enemy speed, health, and fire rate
-- Return to the level map after completing or failing a level
-- Replay any completed level to improve your score
+## File Structure
 
-## Level Progression
+- `main.py`: Main game loop and level management
+- `game.py`: Core game logic, collision detection, and state management
+- `entities.py`: Player, enemies, bosses, bullets, power-ups, and asteroids
+- `ui.py`: All UI screens and menus
+- `settings_menu.py`: Settings and audio controls
+- `assets.py`: Asset loading and audio management
+- `save_system.py`: Save/load game progress
+- `constants.py`: Game constants and configuration
+- `assets/`: All game assets (images and sounds)
 
-1. Level 1: Complete to unlock Ship 2 and Level 2
-2. Level 2: Complete to unlock Ship 3 and Level 3
-3. Level 3: Final level with the ultimate boss battle
+## Credits
 
-## Window Management
-
-Space Fighters supports all standard window operations:
-- **Resize**: Drag window edges or corners to any size
-- **Minimize**: Click minimize button or Windows + Down Arrow
-- **Maximize**: Click maximize button or Windows + Up Arrow
-- **Close**: Click X button or Alt + F4
-- **Responsive**: Game automatically scales to window size
-- **Adaptive HUD**: UI elements reposition based on window size
-
-See **WINDOW_FEATURES.md** for detailed window management guide.
-
----
-
-- After destroying the required enemies, a boss appears
-- Bosses have significantly more health and shoot more frequently
-- The final boss (level 3) shoots triple bullets and is extra tough
-- Defeat the boss to progress to the next level
-
-## Scoring
-
-- Enemy destruction: 10 × current level points
-- Boss destruction: 500 points
-- Power-up collection: 50 points
-
-Good luck, pilot!
-
+Developed with Python and Pygame
+Enhanced Edition with advanced features and progression system

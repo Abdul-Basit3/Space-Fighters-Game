@@ -6,14 +6,17 @@ import random
 import math
 from enum import Enum
 from constants import *
-from assets import PLAYER_SHIPS, BULLET_IMAGES, ENEMY_IMAGES, BOSS_IMG, BOSS_SHIP_IMG
-from assets import PLAYER_SHOOT, SPACE_SHOOT, BOSS_SHOOT
+from assets import (PLAYER_SHIPS, BULLET_IMAGES, BLUE_LASER, 
+                    ENEMY_L1_IMAGES, ENEMY_L2_IMAGES, ENEMY_L3_IMAGES, ENEMY_L4_IMAGES, ENEMY_L5_IMAGES,
+                    BOSS_IMAGES, ENEMY_EXPLOSION, PLAYER_EXPLOSION,
+                    SHIP1_SHOOT, SHIP2_SHOOT, LASER_SHOOTING, BOSS_SHOOT, EXPLOSION_1, EXPLOSION_2,
+                    GAME_OVER_SOUND, LOOSE_SOUND, SOUND_MUTED)
 
 class PowerUpType(Enum):
     """Defines the types of power-ups available in the game"""
-    BULLET_2 = 1  # Enhanced double-shot bullets
-    BULLET_3 = 2  # Super triple-shot bullets with increased damage
-    SHIELD = 3    # Shield protection and health restoration
+    BULLET_POWER = 1  # Increase bullet power level
+    HEALTH = 2        # Health restoration
+    SHIELD = 3        # Shield protection
 
 class Player(pygame.sprite.Sprite):
     """
@@ -21,12 +24,14 @@ class Player(pygame.sprite.Sprite):
     Handles player movement, shooting, health, and power-ups.
     Supports both keyboard and mouse controls.
     """
-    def __init__(self, ship_choice=0):
+    def __init__(self, ship_choice=0, bullet_power=0, health=100):
         """
         Initialize the player.
         
         Args:
             ship_choice: Index of the ship image to use (0-2)
+            bullet_power: Starting bullet power level (0-3)
+            health: Starting health
         """
         super().__init__()
         self.ship_choice = ship_choice
@@ -39,18 +44,22 @@ class Player(pygame.sprite.Sprite):
         self.speed = 5
         
         # Health system
-        self.health = 100
+        self.health = health
         self.max_health = 100
         
         # Shooting system
-        self.shoot_delay = 250  # Milliseconds between shots
+        self.shoot_delay = 250 if ship_choice != 2 else 200  # Blue ship shoots faster
         self.last_shot = pygame.time.get_ticks()
         
         # Power-up system
         self.power_up = None
         self.power_up_timer = 0
         self.shield_active = False
-        self.bullet_level = 0  # 0=bullet_1, 1=bullet_2, 2=bullet_3
+        self.bullet_level = bullet_power  # 0=bullet_1, 1=bullet_2, 2=bullet_3, 3=bullet_4
+        
+        # Explosion animation
+        self.exploding = False
+        self.explosion_timer = 0
         
     def update(self, screen_width=INITIAL_WIDTH, screen_height=INITIAL_HEIGHT):
         """
@@ -105,7 +114,7 @@ class Player(pygame.sprite.Sprite):
             
     def shoot(self):
         """
-        Create bullets based on current weapon level.
+        Create bullets based on current weapon level and ship type.
         
         Returns:
             list: List of Bullet objects created
@@ -116,18 +125,33 @@ class Player(pygame.sprite.Sprite):
             self.last_shot = now
             bullets = []
             
-            if PLAYER_SHOOT:
-                PLAYER_SHOOT.play()
+            # Play appropriate shooting sound
+            if not SOUND_MUTED:
+                if self.ship_choice == 2:  # Blue ship uses laser sound
+                    if LASER_SHOOTING:
+                        LASER_SHOOTING.play()
+                elif self.ship_choice == 1:  # Ship2 uses ship2_shoot
+                    if SHIP2_SHOOT:
+                        SHIP2_SHOOT.play()
+                else:  # Ship1 uses ship1_shoot
+                    if SHIP1_SHOOT:
+                        SHIP1_SHOOT.play()
             
-            if self.bullet_level == 2:  # bullet_3 - triple shot spread
-                bullets.append(Bullet(self.rect.centerx, self.rect.top, 0, self.bullet_level))
-                bullets.append(Bullet(self.rect.centerx - 15, self.rect.top, -2, self.bullet_level))
-                bullets.append(Bullet(self.rect.centerx + 15, self.rect.top, 2, self.bullet_level))
+            # Create bullets based on power level
+            if self.bullet_level == 3:  # bullet_4 - quad shot
+                bullets.append(Bullet(self.rect.centerx, self.rect.top, 0, self.bullet_level, self.ship_choice))
+                bullets.append(Bullet(self.rect.centerx - 20, self.rect.top, -1, self.bullet_level, self.ship_choice))
+                bullets.append(Bullet(self.rect.centerx + 20, self.rect.top, 1, self.bullet_level, self.ship_choice))
+                bullets.append(Bullet(self.rect.centerx, self.rect.top - 10, 0, self.bullet_level, self.ship_choice))
+            elif self.bullet_level == 2:  # bullet_3 - triple shot spread
+                bullets.append(Bullet(self.rect.centerx, self.rect.top, 0, self.bullet_level, self.ship_choice))
+                bullets.append(Bullet(self.rect.centerx - 15, self.rect.top, -2, self.bullet_level, self.ship_choice))
+                bullets.append(Bullet(self.rect.centerx + 15, self.rect.top, 2, self.bullet_level, self.ship_choice))
             elif self.bullet_level == 1:  # bullet_2 - double shot
-                bullets.append(Bullet(self.rect.centerx - 10, self.rect.top, 0, self.bullet_level))
-                bullets.append(Bullet(self.rect.centerx + 10, self.rect.top, 0, self.bullet_level))
+                bullets.append(Bullet(self.rect.centerx - 10, self.rect.top, 0, self.bullet_level, self.ship_choice))
+                bullets.append(Bullet(self.rect.centerx + 10, self.rect.top, 0, self.bullet_level, self.ship_choice))
             else:  # bullet_1 - single shot
-                bullets.append(Bullet(self.rect.centerx, self.rect.top, 0, self.bullet_level))
+                bullets.append(Bullet(self.rect.centerx, self.rect.top, 0, self.bullet_level, self.ship_choice))
             
             return bullets
         return []
@@ -142,13 +166,38 @@ class Player(pygame.sprite.Sprite):
         self.power_up = power_type
         self.power_up_timer = 300  # Duration in frames (5 seconds at 60 FPS)
         
-        if power_type == PowerUpType.BULLET_2:
-            self.bullet_level = 1
-        elif power_type == PowerUpType.BULLET_3:
-            self.bullet_level = 2
+        if power_type == PowerUpType.BULLET_POWER:
+            # Increase bullet power level (max 3)
+            self.bullet_level = min(self.bullet_level + 1, 3)
+        elif power_type == PowerUpType.HEALTH:
+            # Restore health
+            self.health = min(self.health + 30, self.max_health)
         elif power_type == PowerUpType.SHIELD:
             self.shield_active = True
-            self.health = min(self.health + 30, self.max_health)
+            self.health = min(self.health + 20, self.max_health)
+    
+    def take_damage(self, damage):
+        """
+        Take damage and reduce bullet power if hit
+        
+        Args:
+            damage: Amount of damage to take
+        """
+        if not self.shield_active:
+            self.health -= damage
+            # Reduce bullet power when hit
+            if self.bullet_level > 0 and damage >= 10:
+                self.bullet_level = max(0, self.bullet_level - 1)
+    
+    def start_explosion(self):
+        """Start player explosion animation"""
+        self.exploding = True
+        self.explosion_timer = 30  # Frames for explosion animation
+        if not SOUND_MUTED:
+            if GAME_OVER_SOUND:
+                GAME_OVER_SOUND.play()
+            # Play loose sound after game over sound
+            pygame.time.set_timer(pygame.USEREVENT + 1, 1500, 1)  # Play after 1.5 seconds
 
 class Enemy(pygame.sprite.Sprite):
     """
@@ -158,7 +207,19 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__()
         self.level = level
         self.enemy_type = enemy_type
-        self.image = ENEMY_IMAGES[enemy_type % 3]
+        
+        # Select enemy image based on level
+        if level == 1:
+            self.image = ENEMY_L1_IMAGES[enemy_type % len(ENEMY_L1_IMAGES)]
+        elif level == 2:
+            self.image = ENEMY_L2_IMAGES[enemy_type % len(ENEMY_L2_IMAGES)]
+        elif level == 3:
+            self.image = ENEMY_L3_IMAGES[enemy_type % len(ENEMY_L3_IMAGES)]
+        elif level == 4:
+            self.image = ENEMY_L4_IMAGES[enemy_type % len(ENEMY_L4_IMAGES)]
+        else:  # level 5
+            self.image = ENEMY_L5_IMAGES[enemy_type % len(ENEMY_L5_IMAGES)]
+        
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -168,8 +229,18 @@ class Enemy(pygame.sprite.Sprite):
         self.shoot_delay = max(1500 - level * 100, 800)
         self.last_shot = pygame.time.get_ticks()
         
+        # Explosion animation
+        self.exploding = False
+        self.explosion_timer = 0
+        
     def update(self, player_pos, screen_height=600):
         """Update enemy position with AI tracking"""
+        if self.exploding:
+            self.explosion_timer -= 1
+            if self.explosion_timer <= 0:
+                self.kill()
+            return
+        
         self.rect.y += self.speed
         
         # Simple AI: move horizontally towards player
@@ -183,34 +254,56 @@ class Enemy(pygame.sprite.Sprite):
     
     def shoot(self):
         """Attempt to shoot a bullet"""
+        if self.exploding:
+            return None
+        
         now = pygame.time.get_ticks()
         if now - self.last_shot > self.shoot_delay:
             self.last_shot = now
-            if SPACE_SHOOT:
-                SPACE_SHOOT.play()
+            if not SOUND_MUTED and BOSS_SHOOT:
+                BOSS_SHOOT.play()
             return EnemyBullet(self.rect.centerx, self.rect.bottom)
         return None
+    
+    def start_explosion(self):
+        """Start enemy explosion animation"""
+        self.exploding = True
+        self.explosion_timer = 20
+        self.image = ENEMY_EXPLOSION
+        if not SOUND_MUTED and EXPLOSION_1:
+            EXPLOSION_1.play()
 
 class Boss(pygame.sprite.Sprite):
     """Boss enemy class with enhanced abilities"""
-    def __init__(self, is_final_boss=False):
+    def __init__(self, level=1):
         super().__init__()
-        self.is_final_boss = is_final_boss
-        self.image = BOSS_SHIP_IMG if is_final_boss else BOSS_IMG
+        self.level = level
+        self.image = BOSS_IMAGES[min(level - 1, len(BOSS_IMAGES) - 1)]
         self.rect = self.image.get_rect()
         self.rect.centerx = INITIAL_WIDTH // 2
         self.rect.y = -100
         
+        self.is_final_boss = (level == 5)
         self.speed = 1
-        self.health = 50 if is_final_boss else 30
+        self.health = 30 + (level * 10)
         self.max_health = self.health
-        self.shoot_delay = 500 if is_final_boss else 800
+        self.shoot_delay = 500 if self.is_final_boss else 800
         self.last_shot = pygame.time.get_ticks()
         self.direction = 1
         self.moving_down = True
         
+        # Explosion animation
+        self.exploding = False
+        self.explosion_timer = 0
+        
     def update(self, player_pos, screen_width=800):
         """Update boss position with movement pattern"""
+        if self.exploding:
+            self.explosion_timer -= 1
+            if self.explosion_timer <= 0:
+                self.kill()
+            return
+        
         if self.moving_down and self.rect.y < 50:
             self.rect.y += self.speed
         else:
@@ -222,29 +315,56 @@ class Boss(pygame.sprite.Sprite):
     
     def shoot(self):
         """Boss shooting pattern"""
+        if self.exploding:
+            return []
+        
         now = pygame.time.get_ticks()
         if now - self.last_shot > self.shoot_delay:
             self.last_shot = now
-            if BOSS_SHOOT:
+            if not SOUND_MUTED and BOSS_SHOOT:
                 BOSS_SHOOT.play()
             
             bullets = []
             if self.is_final_boss:
+                # Final boss shoots 5 bullets
+                bullets.append(EnemyBullet(self.rect.centerx, self.rect.bottom))
+                bullets.append(EnemyBullet(self.rect.centerx - 30, self.rect.bottom))
+                bullets.append(EnemyBullet(self.rect.centerx + 30, self.rect.bottom))
+                bullets.append(EnemyBullet(self.rect.centerx - 60, self.rect.bottom))
+                bullets.append(EnemyBullet(self.rect.centerx + 60, self.rect.bottom))
+            elif self.level >= 3:
+                # Level 3+ bosses shoot 3 bullets
                 bullets.append(EnemyBullet(self.rect.centerx, self.rect.bottom))
                 bullets.append(EnemyBullet(self.rect.centerx - 30, self.rect.bottom))
                 bullets.append(EnemyBullet(self.rect.centerx + 30, self.rect.bottom))
             else:
+                # Early bosses shoot 1 bullet
                 bullets.append(EnemyBullet(self.rect.centerx, self.rect.bottom))
             
             return bullets
         return []
+    
+    def start_explosion(self):
+        """Start boss explosion animation"""
+        self.exploding = True
+        self.explosion_timer = 40
+        self.image = pygame.transform.scale(ENEMY_EXPLOSION, (self.rect.width, self.rect.height))
+        if not SOUND_MUTED and EXPLOSION_2:
+            EXPLOSION_2.play()
 
 class Bullet(pygame.sprite.Sprite):
     """Player bullet class"""
-    def __init__(self, x, y, offset_x=0, bullet_level=0):
+    def __init__(self, x, y, offset_x=0, bullet_level=0, ship_choice=0):
         super().__init__()
         self.bullet_level = bullet_level
-        self.image = BULLET_IMAGES[bullet_level]
+        self.ship_choice = ship_choice
+        
+        # Blue ship uses laser
+        if ship_choice == 2:
+            self.image = BLUE_LASER
+        else:
+            self.image = BULLET_IMAGES[min(bullet_level, len(BULLET_IMAGES) - 1)]
+        
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
@@ -283,15 +403,18 @@ class PowerUp(pygame.sprite.Sprite):
         self.type = random.choice(list(PowerUpType))
         self.image = pygame.Surface((20, 20))
         
-        if self.type == PowerUpType.BULLET_2:
+        if self.type == PowerUpType.BULLET_POWER:
             self.image.fill(YELLOW)
             pygame.draw.rect(self.image, ORANGE, (5, 5, 10, 10))
-        elif self.type == PowerUpType.BULLET_3:
-            self.image.fill(PURPLE)
-            pygame.draw.rect(self.image, YELLOW, (5, 5, 10, 10))
+            self.name = "BULLET+"
+        elif self.type == PowerUpType.HEALTH:
+            self.image.fill(RED)
+            pygame.draw.circle(self.image, WHITE, (10, 10), 8)
+            self.name = "HEALTH"
         else:  # SHIELD
             self.image.fill(GREEN)
             pygame.draw.circle(self.image, WHITE, (10, 10), 8)
+            self.name = "SHIELD"
             
         self.rect = self.image.get_rect()
         self.rect.x = x

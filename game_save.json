@@ -1,0 +1,21 @@
+{
+    "highest_level": 1,
+    "completed_levels": [
+        false,
+        false,
+        false,
+        false,
+        false
+    ],
+    "unlocked_ships": [
+        true,
+        false,
+        false
+    ],
+    "bullet_power": 0,
+    "player_health": 90,
+    "music_volume": 0.9833333333333333,
+    "sound_volume": 0.97,
+    "music_muted": false,
+    "sound_muted": false
+}

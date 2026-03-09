@@ -7,6 +7,9 @@ INITIAL_WIDTH = 800
 INITIAL_HEIGHT = 600
 FPS = 60
 
+# Game levels
+MAX_LEVELS = 5
+
 # Color Definitions
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
