@@ -157,7 +157,16 @@ def play_level(game, ui, settings_menu):
                 if result == "quit":
                     return "continue"
                 
-                # Continue to next level automatically
+                # Allow player to select ship for next level
+                new_ship_choice = ui.select_ship()
+                if new_ship_choice is None:
+                    # Player cancelled, return to main menu
+                    return "continue"
+                
+                # Update ship choice
+                game.ship_choice = new_ship_choice
+                
+                # Show next level start message
                 game._last_message = (f"LEVEL {game.level}", "Press SPACE to start", False)
                 ui.show_message(game._last_message[0], game._last_message[1], game._last_message[2])
                 result = ui.wait_for_key()
