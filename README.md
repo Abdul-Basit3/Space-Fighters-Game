@@ -6,7 +6,6 @@ A comprehensive space shooter game built with Python and Pygame featuring 5 prog
 
 ### Game Progression
 - **5 Progressive Levels**: Each level features unique enemies, bosses, and increasing difficulty
-- **Bonus Asteroid Mission**: Unlocked after completing Level 4, destroy asteroids to gain power-ups
 - **Boss Battles**: Face unique bosses at the end of each level, culminating in the final boss at Level 5
 - **Save/Load System**: Your progress, bullet power, health, and unlocked ships are automatically saved
 
@@ -35,7 +34,6 @@ A comprehensive space shooter game built with Python and Pygame featuring 5 prog
 ### Levels & Environments
 - **Dynamic Backgrounds**: Rotates through Space 1, Space 2, and Space 3
 - **Planet Visuals**: Each level displays its corresponding planet (Planet-1 through Planet-5) at the center
-- **Bonus Mission**: Special asteroid field with bonus.jpg background
 
 ### Enemies
 - **Level-Specific Enemies**: Each level has unique enemy ships (enemy_L1 through enemy_L5)
@@ -81,7 +79,7 @@ A comprehensive space shooter game built with Python and Pygame featuring 5 prog
 
 ## Installation
 
-1. Install Python 3.7 or higher
+1. Install Python 3.10 or 3.11 Recommended
 2. Install Pygame:
    ```bash
    pip install pygame
@@ -111,9 +109,8 @@ A comprehensive space shooter game built with Python and Pygame featuring 5 prog
 ## Game Progression
 
 1. **Level 1-3**: Complete levels to unlock Ship 2
-2. **Level 4**: Complete to unlock Blue Ship and Bonus Mission
-3. **Bonus Mission**: Optional asteroid destruction mission for power-ups
-4. **Level 5**: Final level with the ultimate boss battle
+2. **Level 4**: Complete to unlock Blue Ship 
+3. **Level 5**: Final level with the ultimate boss battle
 
 ## Tips
 
