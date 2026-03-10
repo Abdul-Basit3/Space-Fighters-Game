@@ -44,11 +44,19 @@ def main():
     settings_menu = SettingsMenu(game)
     
     running = True
+    show_tutorial_flag = True  # Show tutorial on first run
     
     # Show splash screen
     if not ui.show_splash_screen():
         pygame.quit()
         return
+    
+    # Show tutorial on first launch
+    if show_tutorial_flag:
+        if not ui.show_tutorial():
+            pygame.quit()
+            return
+        show_tutorial_flag = False
     
     # Main game loop - allows replaying levels
     while running:
@@ -61,6 +69,12 @@ def main():
             return
         elif menu_choice == "settings":
             settings_menu.show_settings()
+            # Check if game was reset in settings
+            if settings_menu.game_was_reset:
+                settings_menu.game_was_reset = False  # Reset flag
+                if not ui.show_tutorial():
+                    pygame.quit()
+                    return
             continue
         elif menu_choice != "play":
             continue
@@ -146,6 +160,9 @@ def play_level(game, ui, settings_menu):
                     game.saved_bullet_power = 0
                     game.saved_health = 100
                     game.save_game_progress()
+                    # Show tutorial after reset
+                    if not ui.show_tutorial():
+                        return "quit"
                 return "continue"
             else:
                 # Show level complete message and continue to next level
@@ -196,6 +213,9 @@ def play_level(game, ui, settings_menu):
                 game.saved_bullet_power = 0
                 game.saved_health = 100
                 game.save_game_progress()
+                # Show tutorial after reset
+                if not ui.show_tutorial():
+                    return "quit"
             return "continue"
                     
         elif status == "time_up":

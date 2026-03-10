@@ -556,3 +556,211 @@ class UI:
         
         pygame.event.clear()
         return selected
+
+    def show_tutorial(self):
+        """Display tutorial screen for beginners"""
+        page = 0
+        total_pages = 3
+        
+        while True:
+            self.game.clock.tick(FPS)
+            
+            # Background
+            scaled_bg = pygame.transform.scale(BACKGROUNDS[0], (self.game.screen_width, self.game.screen_height))
+            self.game.screen.blit(scaled_bg, (0, 0))
+            
+            overlay = pygame.Surface((self.game.screen_width, self.game.screen_height))
+            overlay.set_alpha(220)
+            overlay.fill(BLACK)
+            self.game.screen.blit(overlay, (0, 0))
+            
+            # Title
+            title = self.game.font.render("HOW TO PLAY", True, CYAN)
+            title_rect = title.get_rect(center=(self.game.screen_width // 2, 50))
+            self.game.screen.blit(title, title_rect)
+            
+            # Page indicator
+            page_text = self.game.small_font.render(f"Page {page + 1} of {total_pages}", True, WHITE)
+            page_rect = page_text.get_rect(center=(self.game.screen_width // 2, 100))
+            self.game.screen.blit(page_text, page_rect)
+            
+            # Content based on page
+            content_y = 150
+            line_spacing = 40
+            
+            if page == 0:
+                # Page 1: Basic Controls
+                subtitle = self.game.font.render("BASIC CONTROLS", True, YELLOW)
+                subtitle_rect = subtitle.get_rect(center=(self.game.screen_width // 2, content_y))
+                self.game.screen.blit(subtitle, subtitle_rect)
+                
+                controls = [
+                    ("MOVEMENT", ""),
+                    ("W / Arrow Up", "Move Up"),
+                    ("S / Arrow Down", "Move Down"),
+                    ("A / Arrow Left", "Move Left"),
+                    ("D / Arrow Right", "Move Right"),
+                    ("", ""),
+                    ("SHOOTING", ""),
+                    ("SPACE", "Shoot (Hold for continuous fire)"),
+                    ("Left Mouse Button", "Shoot (Hold for continuous fire)"),
+                    ("", ""),
+                    ("ALTERNATIVE CONTROL", ""),
+                    ("Right/Middle Mouse", "Drag ship to position"),
+                ]
+                
+                y = content_y + 50
+                for key, desc in controls:
+                    if not key and not desc:
+                        y += 10
+                        continue
+                    if not desc:
+                        # Section header
+                        text = self.game.small_font.render(key, True, ORANGE)
+                        text_rect = text.get_rect(center=(self.game.screen_width // 2, y))
+                        self.game.screen.blit(text, text_rect)
+                    else:
+                        # Control description
+                        key_text = self.game.small_font.render(key, True, GREEN)
+                        key_rect = key_text.get_rect(midright=(self.game.screen_width // 2 - 20, y))
+                        self.game.screen.blit(key_text, key_rect)
+                        
+                        desc_text = self.game.small_font.render(desc, True, WHITE)
+                        desc_rect = desc_text.get_rect(midleft=(self.game.screen_width // 2 + 20, y))
+                        self.game.screen.blit(desc_text, desc_rect)
+                    y += line_spacing
+            
+            elif page == 1:
+                # Page 2: Game Mechanics
+                subtitle = self.game.font.render("GAME MECHANICS", True, YELLOW)
+                subtitle_rect = subtitle.get_rect(center=(self.game.screen_width // 2, content_y))
+                self.game.screen.blit(subtitle, subtitle_rect)
+                
+                mechanics = [
+                    ("OBJECTIVE", ""),
+                    ("• Destroy required enemies within time limit", WHITE),
+                    ("• Defeat the boss to complete the level", WHITE),
+                    ("• Complete all 5 levels to win the game", WHITE),
+                    ("", ""),
+                    ("POWER-UPS (Drop from enemies)", ""),
+                    ("• Yellow Square: Bullet Power (+50 points)", YELLOW),
+                    ("  Upgrades: Single → Double → Triple → Quad shot", WHITE),
+                    ("• Red Circle: Health (+30 HP)", RED),
+                    ("• Green Circle: Shield (Invincibility + 20 HP)", GREEN),
+                    ("", ""),
+                    ("SCORING", ""),
+                    ("• Enemy Kill: 10 × Level points", WHITE),
+                    ("• Boss Defeat: 500 points", WHITE),
+                    ("• Bullet Power Pickup: 50 points", WHITE),
+                ]
+                
+                y = content_y + 50
+                for text, color in mechanics:
+                    if not text:
+                        y += 10
+                        continue
+                    if not color:
+                        # Section header
+                        rendered = self.game.small_font.render(text, True, ORANGE)
+                        text_rect = rendered.get_rect(center=(self.game.screen_width // 2, y))
+                    else:
+                        # Regular text
+                        rendered = self.game.small_font.render(text, True, color)
+                        text_rect = rendered.get_rect(center=(self.game.screen_width // 2, y))
+                    self.game.screen.blit(rendered, text_rect)
+                    y += line_spacing
+            
+            elif page == 2:
+                # Page 3: Tips & Additional Controls
+                subtitle = self.game.font.render("TIPS & EXTRAS", True, YELLOW)
+                subtitle_rect = subtitle.get_rect(center=(self.game.screen_width // 2, content_y))
+                self.game.screen.blit(subtitle, subtitle_rect)
+                
+                tips = [
+                    ("GAMEPLAY TIPS", ""),
+                    ("• Collect Bullet Power to increase firepower", WHITE),
+                    ("• Bullet power decreases when you take damage", WHITE),
+                    ("• Use Shield power-up for temporary invincibility", WHITE),
+                    ("• Higher levels give more points per enemy", WHITE),
+                    ("• Watch the timer - complete objectives quickly!", WHITE),
+                    ("", ""),
+                    ("SHIP UNLOCKS", ""),
+                    ("• Ship 2: Complete Level 1", WHITE),
+                    ("• Blue Ship: Complete Level 3 (Faster shooting!)", CYAN),
+                    ("", ""),
+                    ("ADDITIONAL CONTROLS", ""),
+                    ("• P or ESC: Pause game", WHITE),
+                    ("• ESC in menus: Go back", WHITE),
+                    ("• Window is resizable - drag corners!", WHITE),
+                ]
+                
+                y = content_y + 50
+                for text, color in tips:
+                    if not text:
+                        y += 10
+                        continue
+                    if not color:
+                        # Section header
+                        rendered = self.game.small_font.render(text, True, ORANGE)
+                        text_rect = rendered.get_rect(center=(self.game.screen_width // 2, y))
+                    else:
+                        # Regular text
+                        rendered = self.game.small_font.render(text, True, color)
+                        text_rect = rendered.get_rect(center=(self.game.screen_width // 2, y))
+                    self.game.screen.blit(rendered, text_rect)
+                    y += line_spacing
+            
+            # Navigation instructions
+            nav_y = self.game.screen_height - 80
+            if page > 0:
+                prev_text = self.game.small_font.render("← LEFT/UP: Previous", True, YELLOW)
+                prev_rect = prev_text.get_rect(midleft=(50, nav_y))
+                self.game.screen.blit(prev_text, prev_rect)
+            
+            if page < total_pages - 1:
+                next_text = self.game.small_font.render("RIGHT/DOWN/SPACE/ENTER: Next →", True, YELLOW)
+                next_rect = next_text.get_rect(midright=(self.game.screen_width - 50, nav_y))
+                self.game.screen.blit(next_text, next_rect)
+            else:
+                start_text = self.game.small_font.render("SPACE/ENTER: Start Game →", True, GREEN)
+                start_rect = start_text.get_rect(midright=(self.game.screen_width - 50, nav_y))
+                self.game.screen.blit(start_text, start_rect)
+            
+            skip_text = self.game.small_font.render("ESC: Skip Tutorial", True, (150, 150, 150))
+            skip_rect = skip_text.get_rect(center=(self.game.screen_width // 2, self.game.screen_height - 30))
+            self.game.screen.blit(skip_text, skip_rect)
+            
+            pygame.display.flip()
+            
+            # Event handling
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False
+                
+                if event.type == pygame.VIDEORESIZE:
+                    self.game.handle_window_resize(event.w, event.h)
+                
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        if BUTTON_CLICK:
+                            BUTTON_CLICK.play()
+                        return True
+                    # Previous page: LEFT or UP arrow
+                    elif (event.key == pygame.K_LEFT or event.key == pygame.K_UP) and page > 0:
+                        if BUTTON_NAV:
+                            BUTTON_NAV.play()
+                        page -= 1
+                    # Next page: RIGHT, DOWN, SPACE, or ENTER
+                    elif (event.key == pygame.K_RIGHT or event.key == pygame.K_DOWN or 
+                          event.key == pygame.K_SPACE or event.key == pygame.K_RETURN):
+                        if page < total_pages - 1:
+                            if BUTTON_NAV:
+                                BUTTON_NAV.play()
+                            page += 1
+                        else:
+                            # On last page, start game
+                            if BUTTON_CLICK:
+                                BUTTON_CLICK.play()
+                            return True
+        
+        return True

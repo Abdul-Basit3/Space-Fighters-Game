@@ -13,6 +13,7 @@ class SettingsMenu:
         self.game = game
         self.font = pygame.font.Font(None, 36)
         self.small_font = pygame.font.Font(None, 24)
+        self.game_was_reset = False  # Track if game was reset
         
     def show_settings(self, from_pause=False):
         """Display settings menu"""
@@ -224,6 +225,7 @@ class SettingsMenu:
                                                 self.game.saved_bullet_power = 0
                                                 self.game.saved_health = 100
                                                 self.game.save_game_progress()
+                                                self.game_was_reset = True  # Set flag
                                         elif opt == "Resume Game":
                                             self.game.save_game_progress()
                                             self.game.paused = False
@@ -285,6 +287,7 @@ class SettingsMenu:
                                 self.game.saved_bullet_power = 0
                                 self.game.saved_health = 100
                                 self.game.save_game_progress()
+                                self.game_was_reset = True  # Set flag
                         elif options[selected_option] == "Resume Game":
                             self.game.save_game_progress()
                             self.game.paused = False
